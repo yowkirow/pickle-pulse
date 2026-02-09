@@ -6,6 +6,7 @@ import { useBracketData } from '../hooks/useBracketData';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import { useLiveTicker } from '../hooks/useLiveTicker';
 import { useSearchParams } from 'react-router-dom';
+import { useAutopilot } from '../hooks/useAutopilot';
 
 interface DashboardStatProps {
     label: string;
@@ -96,6 +97,9 @@ export const AdminDashboard: React.FC = () => {
     const { rounds, loading } = useBracketData(tournamentId);
     const stats = useDashboardStats(tournamentId);
     const tickerMatches = useLiveTicker(tournamentId);
+
+    // Live Heartbeat: Auto-manage match flow
+    useAutopilot(tournamentId, true);
 
     return (
         <div className="space-y-10">
