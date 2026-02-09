@@ -83,4 +83,3 @@ export const BracketEngine = {
         return `Round of ${Math.pow(2, totalRounds - round + 1)}`;
     }
 };
-```
