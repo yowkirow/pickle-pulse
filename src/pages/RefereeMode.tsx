@@ -3,7 +3,6 @@ import { Shield, ChevronLeft, RotateCcw, CheckCircle2, Trophy, Activity, Search 
 import { useLiveTicker } from '../hooks/useLiveTicker';
 import { useLiveMatch } from '../hooks/useLiveMatch';
 import { MatchService } from '../services/matchService';
-import type { MatchNode } from '../types/tournament';
 
 export const RefereeMode: React.FC = () => {
     const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
