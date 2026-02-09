@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { MatchNode } from '../types/tournament';
+import type { MatchNode } from '../types/tournament';
 
 export const useLiveTicker = (tournamentId?: string) => {
     const [matches, setMatches] = useState<MatchNode[]>([]);

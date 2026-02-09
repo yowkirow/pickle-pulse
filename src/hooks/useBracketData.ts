@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Round, MatchNode } from '../types/tournament';
+import type { Round, MatchNode } from '../types/tournament';
 
 export const useBracketData = (tournamentId: string | undefined) => {
     const [rounds, setRounds] = useState<Round[]>([]);

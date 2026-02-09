@@ -1,5 +1,5 @@
 import React from 'react';
-import { Round, MatchNode } from '../../types/tournament';
+import type { Round, MatchNode } from '../../types/tournament';
 
 interface BracketProps {
     rounds: Round[];

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Activity, LayoutGrid, Clock } from 'lucide-react';
 import { BracketView } from '../components/brackets/BracketView';
-import { Round } from '../types/tournament';
+import type { Round } from '../types/tournament';
 import { useBracketData } from '../hooks/useBracketData';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import { useLiveTicker } from '../hooks/useLiveTicker';
@@ -20,7 +20,7 @@ const DashboardStat = ({ label, value, status, muted }: DashboardStatProps) => (
             {status === 'active' && <span className="inline-block w-1.5 h-1.5 bg-primary rounded-full mr-1 animate-pulse" />}
             {label}
         </p>
-        <p className="text-4xl font-black italic tracking-tighter leading-none">{value < 10 && value !== 0 ? `0${value}` : value}</p>
+        <p className="text-4xl font-black italic tracking-tighter leading-none">{typeof value === 'number' && value < 10 && value !== 0 ? `0${value}` : value}</p>
     </div>
 );
 
