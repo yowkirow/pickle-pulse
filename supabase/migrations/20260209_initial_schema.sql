@@ -27,6 +27,7 @@ CREATE TABLE matches (
     p1_name TEXT NOT NULL,
     p2_name TEXT NOT NULL,
     status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'in_progress', 'completed')),
+    round_name TEXT, -- E.G. 'Quarter-Finals'
     winner_id UUID,
     scheduled_time TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW()
