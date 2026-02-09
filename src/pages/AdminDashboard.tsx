@@ -5,7 +5,7 @@ import type { Round } from '../types/tournament';
 import { useBracketData } from '../hooks/useBracketData';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import { useLiveTicker } from '../hooks/useLiveTicker';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useAutopilot } from '../hooks/useAutopilot';
 
 interface DashboardStatProps {

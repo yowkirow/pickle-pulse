@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { CourtService, Court } from '../services/courtService';
+import { CourtService } from '../services/courtService';
+import type { Court } from '../services/courtService';
 import { Activity, Plus, Trash2, ChevronLeft, MapPin } from 'lucide-react';
 
 export const CourtManager: React.FC = () => {
