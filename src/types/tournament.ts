@@ -9,6 +9,7 @@ export interface MatchNode {
     winner_id?: string;
     status: MatchStatus;
     round_name?: string;
+    next_match_id?: string;
 }
 
 export interface Round {

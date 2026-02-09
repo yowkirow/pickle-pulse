@@ -51,11 +51,37 @@ export const MatchService = {
     },
 
     async completeMatch(matchId: string, winnerId: string) {
-        const { error } = await supabase
+        // 1. Mark current match as completed
+        const { data: match, error: fetchError } = await supabase
             .from('matches')
             .update({ status: 'completed', winner_id: winnerId })
-            .eq('id', matchId);
+            .eq('id', matchId)
+            .select()
+            .single();
 
-        if (error) throw error;
+        if (fetchError) throw fetchError;
+
+        // 2. If there's a next match, promote the winner
+        if ((match as MatchNode).next_match_id) {
+            const winnerName = winnerId === 'p1' ? (match as MatchNode).p1_name : (match as MatchNode).p2_name;
+
+            // We need to know if we are p1 or p2 in the next match.
+            // A simple way is to check if p1_name is 'TBD' in the next match.
+            // But better logic: find the siblings to determine position.
+            // For now, let's use a simpler heuristic: try to fill p1, then p2.
+            const { data: nextMatch } = await supabase
+                .from('matches')
+                .select('*')
+                .eq('id', (match as MatchNode).next_match_id)
+                .single();
+
+            if (nextMatch) {
+                const fieldToUpdate = (nextMatch as MatchNode).p1_name === 'TBD' ? 'p1_name' : 'p2_name';
+                await supabase
+                    .from('matches')
+                    .update({ [fieldToUpdate]: winnerName })
+                    .eq('id', (match as MatchNode).next_match_id);
+            }
+        }
     }
 };

@@ -30,6 +30,7 @@ CREATE TABLE matches (
     round_name TEXT, -- E.G. 'Quarter-Finals'
     winner_id UUID,
     scheduled_time TIMESTAMPTZ,
+    next_match_id UUID REFERENCES matches(id),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
