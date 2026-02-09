@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { TournamentService } from '../services/tournamentService';
 import { useTournaments } from '../hooks/useTournaments';
+import type { Tournament } from '../types/tournament';
 import { PlusCircle, Trophy, ListOrdered, Share2, Activity, Settings2, Calendar, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const TournamentManager: React.FC = () => {
     const [name, setName] = useState('');
-    const [format, setFormat] = useState<'single_elim' | 'double_elim' | 'round_robin'>('single_elim');
+    const [format, setFormat] = useState<Tournament['format']>('single_elim');
     const [loading, setLoading] = useState(false);
     const { tournaments, loading: listLoading } = useTournaments();
 

@@ -1,12 +1,6 @@
 import { supabase } from '../lib/supabase';
+import type { Tournament } from '../types/tournament';
 
-export type Tournament = {
-    id: string;
-    name: string;
-    status: 'planning' | 'active' | 'completed';
-    format: 'single_elim' | 'double_elim' | 'round_robin';
-    created_at: string;
-};
 
 export const TournamentService = {
     async getAll() {
