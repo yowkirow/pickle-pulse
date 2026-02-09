@@ -119,12 +119,20 @@ export const TournamentManager: React.FC = () => {
     );
 };
 
-const FormatOption = ({ selected, onClick, icon, label, description }: any) => (
+interface FormatOptionProps {
+    selected: boolean;
+    onClick: () => void;
+    icon: React.ReactNode;
+    label: string;
+    description: string;
+}
+
+const FormatOption = ({ selected, onClick, icon, label, description }: FormatOptionProps) => (
     <div
         onClick={onClick}
         className={`p-5 rounded-sport border-2 cursor-pointer transition-all duration-200 flex gap-5 items-center ${selected
-                ? 'bg-primary/10 border-primary border-l-[12px]'
-                : 'bg-background border-border hover:border-accent-muted'
+            ? 'bg-primary/10 border-primary border-l-[12px]'
+            : 'bg-background border-border hover:border-accent-muted'
             }`}
     >
         <div className={`w-12 h-12 rounded-sport flex items-center justify-center ${selected ? 'bg-primary text-background' : 'bg-secondary text-accent-muted'}`}>

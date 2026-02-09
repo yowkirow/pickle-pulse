@@ -81,7 +81,16 @@ export const RefereeMode: React.FC = () => {
     );
 };
 
-const RefereeScoreCard = ({ name, score, onAdd, onUndo, isActive, isSecondary }: any) => (
+interface RefereeScoreCardProps {
+    name: string;
+    score: number;
+    onAdd: () => void;
+    onUndo: () => void;
+    isActive: boolean;
+    isSecondary?: boolean;
+}
+
+const RefereeScoreCard = ({ name, score, onAdd, onUndo, isActive, isSecondary }: RefereeScoreCardProps) => (
     <div className={`sport-card relative flex flex-col pt-0 transition-all duration-300 ${isActive ? 'ring-4 ring-primary ring-inset' : 'opacity-80'}`}>
         <div className={`p-3 font-black uppercase text-[10px] tracking-widest flex items-center justify-between ${isSecondary ? 'bg-background text-white' : 'bg-primary text-background'}`}>
             <span>TEAM IDENTIFIER</span>

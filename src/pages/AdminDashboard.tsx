@@ -1,7 +1,14 @@
 import React, { useEffect } from 'react';
 import { Activity, LayoutGrid, Clock } from 'lucide-react';
 
-const DashboardStat = ({ label, value, status, muted }: any) => (
+interface DashboardStatProps {
+    label: string;
+    value: string | number;
+    status?: 'active';
+    muted?: boolean;
+}
+
+const DashboardStat = ({ label, value, status, muted }: DashboardStatProps) => (
     <div className={`text-right ${muted ? 'opacity-30' : ''}`}>
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-muted leading-tight mb-1">
             {status === 'active' && <span className="inline-block w-1.5 h-1.5 bg-primary rounded-full mr-1 animate-pulse" />}
