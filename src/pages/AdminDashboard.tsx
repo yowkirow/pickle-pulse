@@ -25,29 +25,28 @@ const DashboardStat = ({ label, value, status, muted }: DashboardStatProps) => (
     </div>
 );
 
-const CourtCard = ({ number, status }: { number: number; status: string }) => {
-    const isOccupied = status === 'MATCH IN PROGRESS';
+const CourtCard = ({ court, match }: { court: any; match?: any }) => {
+    const isOccupied = court.status === 'occupied' || !!match;
     return (
         <div className={`sport-card border-l-4 transition-all duration-300 ${isOccupied ? 'border-l-primary' : 'border-l-border opacity-70 hover:opacity-100'}`}>
             <div className="p-4">
                 <div className="flex justify-between items-start mb-4">
                     <span className="font-black text-4xl italic text-border leading-none">
-                        {number < 10 ? `0${number}` : number}
+                        {court.court_number < 10 ? `0${court.court_number}` : court.court_number}
                     </span>
                     <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm ${isOccupied ? 'bg-primary text-background' : 'bg-border text-accent-muted'}`}>
-                        {status}
+                        {isOccupied ? 'MATCH IN PROGRESS' : 'READY'}
                     </span>
                 </div>
 
-                {isOccupied ? (
+                {isOccupied && match ? (
                     <div className="space-y-4">
                         <div className="flex justify-between items-center bg-background/50 p-2 rounded-sm mb-1">
-                            <span className="font-black text-xs uppercase truncate pr-2">Lee / Wang</span>
-                            <span className="font-black text-primary text-xl leading-none">11</span>
+                            <span className="font-black text-xs uppercase truncate pr-2">{match.p1_name}</span>
+                            {/* Score display could be added here if match_sets are fetched */}
                         </div>
                         <div className="flex justify-between items-center bg-background/50 p-2 rounded-sm">
-                            <span className="font-black text-xs uppercase truncate pr-2">Smith / Jones</span>
-                            <span className="font-black text-white text-lg leading-none">08</span>
+                            <span className="font-black text-xs uppercase truncate pr-2">{match.p2_name}</span>
                         </div>
                     </div>
                 ) : (
@@ -58,8 +57,8 @@ const CourtCard = ({ number, status }: { number: number; status: string }) => {
             </div>
 
             <div className="bg-background/80 py-2 px-4 flex justify-between items-center border-t border-border">
-                <span className="text-[10px] font-bold text-accent-muted uppercase">Court {number} Hub</span>
-                <button className="text-[10px] font-black uppercase text-primary tracking-widest hover:underline">Details »</button>
+                <span className="text-[10px] font-bold text-accent-muted uppercase">Court {court.court_number} Hub</span>
+                <Link to={`/admin/courts?tid=${court.tournament_id}`} className="text-[10px] font-black uppercase text-primary tracking-widest hover:underline">Config »</Link>
             </div>
         </div>
     );
@@ -97,9 +96,13 @@ export const AdminDashboard: React.FC = () => {
     const { rounds, loading } = useBracketData(tournamentId);
     const stats = useDashboardStats(tournamentId);
     const tickerMatches = useLiveTicker(tournamentId);
+    const { courts, loading: courtsLoading } = useCourts(tournamentId);
 
     // Live Heartbeat: Auto-manage match flow
     useAutopilot(tournamentId, true);
+
+    // Find active matches for court display
+    const activeMatches = tickerMatches.filter(m => m.status === 'in_progress');
 
     return (
         <div className="space-y-10">
@@ -151,10 +154,24 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                {/* Court Cards */}
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <CourtCard key={i} number={i} status={i % 3 === 0 ? 'MATCH IN PROGRESS' : 'READY'} />
-                ))}
+                {courtsLoading ? (
+                    <div className="col-span-full py-10 text-center sport-card opacity-50">
+                        <Activity className="animate-spin mx-auto mb-2" size={24} />
+                        <p className="text-[10px] font-black uppercase tracking-widest">Scanning Venue...</p>
+                    </div>
+                ) : courts.length > 0 ? (
+                    courts.map((c) => (
+                        <CourtCard
+                            key={c.id}
+                            court={c}
+                            match={activeMatches.find(m => m.court_id === c.id)}
+                        />
+                    ))
+                ) : (
+                    <div className="col-span-full py-10 text-center sport-card bg-white/5 border-dashed border-2 opacity-50">
+                        <p className="text-[10px] font-black uppercase tracking-widest">No Physical Courts Provisioned</p>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
