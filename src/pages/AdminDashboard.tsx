@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { Activity, LayoutGrid, Clock } from 'lucide-react';
 import { BracketView } from '../components/brackets/BracketView';
 import { Round } from '../types/tournament';
+import { useBracketData } from '../hooks/useBracketData';
+import { useSearchParams } from 'react-router-dom';
 
 interface DashboardStatProps {
     label: string;
@@ -87,8 +89,12 @@ const MOCK_ROUNDS: Round[] = [
 ];
 
 export const AdminDashboard: React.FC = () => {
+    const [searchParams] = useSearchParams();
+    const tournamentId = searchParams.get('tid') || undefined;
+    const { rounds, loading } = useBracketData(tournamentId);
+
     useEffect(() => {
-        // Initial fetch and Supabase Realtime subscription would go here
+        // Additional real-time logic
     }, []);
 
     return (
@@ -114,11 +120,17 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Bracket Visualization Engine */}
             <div className="space-y-4">
-                <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
-                    <Activity className="text-primary" size={24} />
-                    Live Championship Bracket
-                </h3>
-                <BracketView rounds={MOCK_ROUNDS} />
+                <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+                        <Activity className="text-primary" size={24} />
+                        Live Championship Bracket
+                    </h3>
+                    <div className="text-[10px] font-bold text-accent-muted uppercase tracking-widest flex items-center gap-2">
+                        {loading ? 'SYNCING PULSE...' : 'LIVE SYNC ACTIVE'}
+                        <div className={`w-2 h-2 rounded-full ${loading ? 'bg-accent-muted' : 'bg-primary animate-pulse'}`} />
+                    </div>
+                </div>
+                <BracketView rounds={rounds.length > 0 ? rounds : MOCK_ROUNDS} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
