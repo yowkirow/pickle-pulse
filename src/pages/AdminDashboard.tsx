@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Activity, LayoutGrid, Clock } from 'lucide-react';
+import { BracketView } from '../components/brackets/BracketView';
 
 interface DashboardStatProps {
     label: string;
@@ -58,6 +59,32 @@ const CourtCard = ({ number, status }: { number: number; status: string }) => {
     );
 };
 
+// Mock data for the bracket
+const MOCK_ROUNDS = [
+    {
+        name: 'Quarter-Finals',
+        matches: [
+            { id: '1', p1_name: 'Anderson/Baker', p2_name: 'Carter/Davis', score1: 11, score2: 8, status: 'completed', winner_id: 'p1' },
+            { id: '2', p1_name: 'Evans/Ford', p2_name: 'Garcia/Hill', score1: 5, score2: 11, status: 'completed', winner_id: 'p2' },
+            { id: '3', p1_name: 'Irwin/Jones', p2_name: 'Kelly/Lee', score1: 11, score2: 13, status: 'completed', winner_id: 'p2' },
+            { id: '4', p1_name: 'Miller/Nash', p2_name: 'Owen/Perez', score1: 11, score2: 4, status: 'completed', winner_id: 'p1' },
+        ]
+    },
+    {
+        name: 'Semi-Finals',
+        matches: [
+            { id: '5', p1_name: 'Anderson/Baker', p2_name: 'Garcia/Hill', status: 'in_progress', score1: 8, score2: 7 },
+            { id: '6', p1_name: 'Kelly/Lee', p2_name: 'Miller/Nash', status: 'scheduled' },
+        ]
+    },
+    {
+        name: 'Finals',
+        matches: [
+            { id: '7', p1_name: 'TBD', p2_name: 'TBD', status: 'scheduled' },
+        ]
+    }
+];
+
 export const AdminDashboard: React.FC = () => {
     useEffect(() => {
         // Initial fetch and Supabase Realtime subscription would go here
@@ -84,6 +111,15 @@ export const AdminDashboard: React.FC = () => {
                 </div>
             </div>
 
+            {/* Bracket Visualization Engine */}
+            <div className="space-y-4">
+                <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+                    <Activity className="text-primary" size={24} />
+                    Live Championship Bracket
+                </h3>
+                <BracketView rounds={MOCK_ROUNDS} />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 {/* Court Cards */}
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -100,7 +136,7 @@ export const AdminDashboard: React.FC = () => {
                             Upcoming Schedule
                         </h3>
                         <button className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
-                            View Full Bracket »
+                            View Full Archive »
                         </button>
                     </div>
 
