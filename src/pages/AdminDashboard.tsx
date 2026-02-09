@@ -3,6 +3,8 @@ import { Activity, LayoutGrid, Clock } from 'lucide-react';
 import { BracketView } from '../components/brackets/BracketView';
 import { Round } from '../types/tournament';
 import { useBracketData } from '../hooks/useBracketData';
+import { useDashboardStats } from '../hooks/useDashboardStats';
+import { useLiveTicker } from '../hooks/useLiveTicker';
 import { useSearchParams } from 'react-router-dom';
 
 interface DashboardStatProps {
@@ -18,7 +20,7 @@ const DashboardStat = ({ label, value, status, muted }: DashboardStatProps) => (
             {status === 'active' && <span className="inline-block w-1.5 h-1.5 bg-primary rounded-full mr-1 animate-pulse" />}
             {label}
         </p>
-        <p className="text-4xl font-black italic tracking-tighter leading-none">{value}</p>
+        <p className="text-4xl font-black italic tracking-tighter leading-none">{value < 10 && value !== 0 ? `0${value}` : value}</p>
     </div>
 );
 
@@ -92,10 +94,8 @@ export const AdminDashboard: React.FC = () => {
     const [searchParams] = useSearchParams();
     const tournamentId = searchParams.get('tid') || undefined;
     const { rounds, loading } = useBracketData(tournamentId);
-
-    useEffect(() => {
-        // Additional real-time logic
-    }, []);
+    const stats = useDashboardStats(tournamentId);
+    const tickerMatches = useLiveTicker(tournamentId);
 
     return (
         <div className="space-y-10">
@@ -112,9 +112,9 @@ export const AdminDashboard: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4">
-                    <DashboardStat label="Matches Live" value="06" status="active" />
-                    <DashboardStat label="In Queue" value="14" />
-                    <DashboardStat label="Completed" value="38" muted />
+                    <DashboardStat label="Matches Live" value={stats.liveMatches} status="active" />
+                    <DashboardStat label="In Queue" value={stats.inQueue} />
+                    <DashboardStat label="Completed" value={stats.completed} muted />
                 </div>
             </div>
 
@@ -141,12 +141,12 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Match Queue */}
+                {/* Real-Time Match Ticker */}
                 <div className="lg:col-span-2 space-y-4">
                     <div className="flex items-center justify-between">
                         <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
                             <Clock className="text-primary" size={24} />
-                            Upcoming Schedule
+                            Live Match Ticker
                         </h3>
                         <button className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
                             View Full Archive »
@@ -154,54 +154,68 @@ export const AdminDashboard: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                        {[1, 2, 3, 4].map((m) => (
-                            <div key={m} className="sport-card p-4 flex items-center justify-between group hover:border-primary/50 transition-colors">
-                                <div className="flex items-center gap-6">
-                                    <div className="text-2xl font-black italic text-border w-10">
-                                        #{24 + m}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-black text-lg uppercase">Anderson / Baker</span>
-                                            <span className="text-accent-muted text-xs">VS</span>
-                                            <span className="font-black text-lg uppercase">Carter / Davis</span>
+                        {tickerMatches.length > 0 ? (
+                            tickerMatches.map((m) => (
+                                <div key={m.id} className="sport-card p-4 flex items-center justify-between group hover:border-primary/50 transition-colors">
+                                    <div className="flex items-center gap-6">
+                                        <div className="text-2xl font-black italic text-border w-10">
+                                            #{m.id.substring(0, 2).toUpperCase()}
                                         </div>
-                                        <p className="text-[10px] font-bold text-accent-muted uppercase tracking-widest">
-                                            Men's Doubles Open • Round of 16
-                                        </p>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`font-black text-lg uppercase ${m.status === 'completed' ? 'text-accent-muted' : ''}`}>
+                                                    {m.p1_name}
+                                                </span>
+                                                <span className="text-accent-muted text-xs">VS</span>
+                                                <span className={`font-black text-lg uppercase ${m.status === 'completed' ? 'text-accent-muted' : ''}`}>
+                                                    {m.p2_name}
+                                                </span>
+                                            </div>
+                                            <p className="text-[10px] font-bold text-accent-muted uppercase tracking-widest">
+                                                {m.round_name || 'Tournament Play'} • {m.status.replace('_', ' ')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-right hidden sm:block">
+                                            <p className="text-[10px] font-bold text-accent-muted uppercase">Pulse Status</p>
+                                            <p className={`font-black text-xs uppercase ${m.status === 'in_progress' ? 'text-primary' : ''}`}>
+                                                {m.status}
+                                            </p>
+                                        </div>
+                                        {m.status === 'scheduled' && (
+                                            <button className="sport-button-outline text-[10px] px-3 py-1 opacity-0 group-hover:opacity-100">
+                                                Assign Court
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="text-right hidden sm:block">
-                                        <p className="text-[10px] font-bold text-accent-muted uppercase">Estimated Start</p>
-                                        <p className="font-black text-xs uppercase">T-Minus 12m</p>
-                                    </div>
-                                    <button className="sport-button-outline text-[10px] px-3 py-1 opacity-0 group-hover:opacity-100">
-                                        Assign Court
-                                    </button>
-                                </div>
+                            ))
+                        ) : (
+                            <div className="py-20 text-center border-2 border-dashed border-border rounded-sport opacity-50">
+                                <p className="font-black uppercase tracking-widest text-xs">No Recent Match Activity</p>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
 
                 {/* Sidebar Info */}
                 <div className="space-y-6">
-                    <div className="sport-card p-6 bg-primary text-background border-none">
-                        <h4 className="font-black uppercase tracking-tighter text-sm mb-4">Smart Autopilot</h4>
-                        <p className="text-2xl font-black leading-tight mb-4 italic">AUTOPILOT IS ACTIVELY OPTIMIZING COURT 04 & 07</p>
+                    <div className="sport-card p-6 bg-primary text-background border-none shadow-broadcast">
+                        <h4 className="font-black uppercase tracking-tighter text-sm mb-4 text-background/60">Smart Autopilot</h4>
+                        <p className="text-2xl font-black leading-tight mb-4 italic">AUTOPILOT IS ACTIVELY SCANNING FOR VACANT COURTS</p>
                         <div className="h-2 bg-background/20 rounded-full overflow-hidden mb-4">
                             <div className="h-full bg-background w-[65%] animate-[shimmer_2s_infinite]" />
                         </div>
-                        <button className="w-full bg-background text-primary font-black uppercase py-2 text-xs tracking-widest hover:scale-[1.02] transition-transform">
-                            Pause Autopilot
+                        <button className="w-full bg-background text-primary font-black uppercase py-2 text-[10px] tracking-widest hover:scale-[1.02] transition-transform">
+                            Pause Stream
                         </button>
                     </div>
 
                     <div className="sport-card p-6 border-2 border-border">
                         <h4 className="font-black uppercase text-sm mb-4 flex items-center gap-2">
                             <LayoutGrid size={18} />
-                            Division Quick-View
+                            Active Divisions
                         </h4>
                         <div className="flex flex-wrap gap-2 text-[10px] font-bold uppercase">
                             <button className="bg-white/10 px-3 py-1.5 rounded-sm hover:bg-primary hover:text-background tracking-widest">Men's Open</button>
