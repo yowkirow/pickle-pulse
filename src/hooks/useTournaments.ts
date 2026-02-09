@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Tournament } from '../types/tournament';
+import type { Tournament } from '../types/tournament';
 
 export const useTournaments = () => {
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
