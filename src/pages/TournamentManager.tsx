@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { TournamentService } from '../services/tournamentService';
-import { PlusCircle, Trophy, ListOrdered, Share2, Activity, Settings2 } from 'lucide-react';
+import { useTournaments } from '../hooks/useTournaments';
+import { PlusCircle, Trophy, ListOrdered, Share2, Activity, Settings2, Calendar, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const TournamentManager: React.FC = () => {
     const [name, setName] = useState('');
     const [format, setFormat] = useState<'single_elim' | 'double_elim' | 'round_robin'>('single_elim');
     const [loading, setLoading] = useState(false);
+    const { tournaments, loading: listLoading } = useTournaments();
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -13,10 +16,10 @@ export const TournamentManager: React.FC = () => {
         try {
             await TournamentService.create({ name, format });
             setName('');
-            alert('Tournament Pulse Initialized!');
-        } catch (err) {
+            // Toast or notification would be better than alert
+        } catch (err: any) {
             console.error(err);
-            alert('Initialization error. Check logs.');
+            alert(`Initialization error: ${err.message || 'Check connection'}`);
         } finally {
             setLoading(false);
         }
@@ -42,11 +45,11 @@ export const TournamentManager: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Creation Form */}
-                <div className="lg:col-span-5 space-y-6">
+                <div className="lg:col-span-4 space-y-6">
                     <div className="sport-card p-8">
                         <h3 className="text-2xl font-black italic uppercase tracking-tighter border-b border-border pb-4 mb-6 flex items-center gap-3">
                             <PlusCircle className="text-primary" size={28} />
-                            Initialize New Event
+                            Initialize Event
                         </h3>
 
                         <form onSubmit={handleCreate} className="space-y-8">
@@ -57,34 +60,31 @@ export const TournamentManager: React.FC = () => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="E.G. US OPEN QUALIFIER"
-                                    className="w-full bg-background border-2 border-border rounded-sport px-4 py-4 focus:outline-none focus:border-primary font-black uppercase tracking-widest transition-colors"
+                                    className="w-full bg-background border-2 border-border rounded-sport px-4 py-4 focus:outline-none focus:border-primary font-black uppercase tracking-widest transition-colors text-white"
                                     required
                                 />
                             </div>
 
                             <div className="space-y-3">
                                 <label className="text-xs font-black uppercase tracking-[0.3em] text-accent-muted">Competition Logic</label>
-                                <div className="grid grid-cols-1 gap-3">
+                                <div className="grid grid-cols-1 gap-2">
                                     <FormatOption
                                         selected={format === 'single_elim'}
                                         onClick={() => setFormat('single_elim')}
-                                        icon={<Trophy size={20} />}
+                                        icon={<Trophy size={16} />}
                                         label="Single Elimination"
-                                        description="Classic Tournament Bracket"
                                     />
                                     <FormatOption
                                         selected={format === 'double_elim'}
                                         onClick={() => setFormat('double_elim')}
-                                        icon={<Share2 size={20} />}
+                                        icon={<Share2 size={16} />}
                                         label="Double Elimination"
-                                        description="Winner & Loser Brackets"
                                     />
                                     <FormatOption
                                         selected={format === 'round_robin'}
                                         onClick={() => setFormat('round_robin')}
-                                        icon={<ListOrdered size={20} />}
+                                        icon={<ListOrdered size={16} />}
                                         label="Round Robin"
-                                        description="Group Play Format"
                                     />
                                 </div>
                             </div>
@@ -92,26 +92,88 @@ export const TournamentManager: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full sport-button py-5 text-xl"
+                                className="w-full sport-button py-5 text-xl flex items-center justify-center gap-3"
                             >
-                                {loading ? 'PROCESSING...' : 'ACTIVATE TOURNAMENT'}
+                                {loading ? (
+                                    <>
+                                        <Activity className="animate-spin" size={24} />
+                                        ACTIVATING...
+                                    </>
+                                ) : (
+                                    'ACTIVATE PULSE'
+                                )}
                             </button>
                         </form>
                     </div>
                 </div>
 
                 {/* Tournament Archive */}
-                <div className="lg:col-span-7 space-y-4">
-                    <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
-                        <Activity className="text-primary" size={24} />
-                        Active Database
-                    </h3>
-                    <div className="sport-card p-12 flex flex-col items-center justify-center text-accent-muted bg-white/5 border-dashed border-2">
-                        <div className="w-20 h-20 bg-border rounded-full flex items-center justify-center mb-6 opacity-20">
-                            <Trophy size={40} />
-                        </div>
-                        <p className="font-black uppercase tracking-[0.2em] italic mb-2">No Active Pulse Detected</p>
-                        <p className="text-xs text-accent-muted/60 max-w-sm text-center font-bold">The tournament registry is currently empty. Use the sidebar to initiate the heartbeat of your first event.</p>
+                <div className="lg:col-span-8 space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+                            <Activity className="text-primary" size={24} />
+                            Active Database
+                        </h3>
+                        {tournaments.length > 0 && (
+                            <span className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">
+                                Pulse Detected ({tournaments.length} Events)
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="space-y-3">
+                        {listLoading ? (
+                            <div className="py-20 text-center sport-card opacity-50">
+                                <Activity className="animate-spin mx-auto mb-4" size={40} />
+                                <p className="font-black uppercase tracking-widest text-xs">Syncing Registry...</p>
+                            </div>
+                        ) : tournaments.length > 0 ? (
+                            tournaments.map((t) => (
+                                <Link
+                                    to={`/admin?tid=${t.id}`}
+                                    key={t.id}
+                                    className="sport-card p-6 flex items-center justify-between group hover:border-primary/50 transition-all cursor-pointer bg-white/5"
+                                >
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-12 h-12 bg-secondary rounded-sport flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-background transition-colors">
+                                            <Trophy size={24} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-2xl italic uppercase tracking-tighter leading-none mb-2 group-hover:text-primary transition-colors">
+                                                {t.name}
+                                            </h4>
+                                            <div className="flex items-center gap-4 text-[10px] font-bold text-accent-muted uppercase tracking-widest">
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar size={12} />
+                                                    {new Date(t.created_at).toLocaleDateString()}
+                                                </span>
+                                                <span className="bg-border px-2 py-0.5 rounded-sm text-white">
+                                                    {t.format.replace('_', ' ')}
+                                                </span>
+                                                <span className="text-primary font-black">
+                                                    {t.status}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-right hidden sm:block">
+                                            <p className="text-[10px] font-bold text-accent-muted uppercase mb-1">Command Center</p>
+                                            <p className="font-black text-xs uppercase text-primary">Live Dashboard »</p>
+                                        </div>
+                                        <ChevronRight className="text-accent-muted group-hover:text-primary transition-colors" size={24} />
+                                    </div>
+                                </Link>
+                            ))
+                        ) : (
+                            <div className="sport-card p-20 flex flex-col items-center justify-center text-accent-muted bg-white/5 border-dashed border-2">
+                                <div className="w-20 h-20 bg-border rounded-full flex items-center justify-center mb-6 opacity-20">
+                                    <Trophy size={40} />
+                                </div>
+                                <p className="font-black uppercase tracking-[0.2em] italic mb-2">No Active Pulse Detected</p>
+                                <p className="text-xs text-accent-muted/60 max-w-sm text-center font-bold">The tournament registry is currently empty. Use the sidebar to initiate the heartbeat of your first event.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -124,23 +186,21 @@ interface FormatOptionProps {
     onClick: () => void;
     icon: React.ReactNode;
     label: string;
-    description: string;
 }
 
-const FormatOption = ({ selected, onClick, icon, label, description }: FormatOptionProps) => (
+const FormatOption = ({ selected, onClick, icon, label }: FormatOptionProps) => (
     <div
         onClick={onClick}
-        className={`p-5 rounded-sport border-2 cursor-pointer transition-all duration-200 flex gap-5 items-center ${selected
-            ? 'bg-primary/10 border-primary border-l-[12px]'
+        className={`p-4 rounded-sport border-2 cursor-pointer transition-all duration-200 flex gap-4 items-center ${selected
+            ? 'bg-primary/10 border-primary border-l-[8px]'
             : 'bg-background border-border hover:border-accent-muted'
             }`}
     >
-        <div className={`w-12 h-12 rounded-sport flex items-center justify-center ${selected ? 'bg-primary text-background' : 'bg-secondary text-accent-muted'}`}>
+        <div className={`w-10 h-10 rounded-sport flex items-center justify-center ${selected ? 'bg-primary text-background' : 'bg-secondary text-accent-muted'}`}>
             {icon}
         </div>
         <div>
-            <p className={`font-black uppercase tracking-tight ${selected ? 'text-white text-xl italic' : 'text-accent-muted'}`}>{label}</p>
-            <p className="text-[10px] font-bold text-accent-muted uppercase tracking-widest">{description}</p>
+            <p className={`font-black uppercase tracking-tight text-sm ${selected ? 'text-white italic' : 'text-accent-muted'}`}>{label}</p>
         </div>
     </div>
 );
