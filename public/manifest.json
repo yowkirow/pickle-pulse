@@ -1,0 +1,16 @@
+{
+    "name": "Pickle-Pulse",
+    "short_name": "PicklePulse",
+    "description": "Real-time Pickleball Tournament Management",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#bef264",
+    "icons": [
+        {
+            "src": "/vite.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}
