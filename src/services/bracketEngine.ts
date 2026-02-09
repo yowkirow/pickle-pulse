@@ -1,44 +1,54 @@
 import { supabase } from '../lib/supabase';
-import type { Tournament, MatchNode } from '../types/tournament';
+import type { MatchNode } from '../types/tournament';
 
 export const BracketEngine = {
     /**
-     * Initializes a single elimination bracket for a tournament.
-     * For now, assumes a power of 2 number of participants or uses placeholders.
+     * Initializes a single elimination bracket bottom-up to link next_match_id.
      */
     async generateInitialBracket(tournamentId: string, participants: string[]) {
         const numParticipants = participants.length;
         const numRounds = Math.ceil(Math.log2(numParticipants));
-        const totalMatches = Math.pow(2, numRounds) - 1;
 
-        // Create rounds and matches
-        let matchesToCreate = [];
-        let currentRoundMatches = Math.pow(2, numRounds - 1);
+        // We'll store matches round by round to link them
+        let previousRoundMatchIds: string[] = [];
 
-        // This is a simplified version. A real engine handles seeds and byes.
-        // For Phase 11, we focus on the structure.
-
-        for (let round = 1; round <= numRounds; round++) {
+        for (let round = numRounds; round >= 1; round--) {
+            const numMatchesInRound = Math.pow(2, numRounds - round);
             const roundName = this.getRoundName(round, numRounds);
-            for (let i = 0; i < currentRoundMatches; i++) {
-                matchesToCreate.push({
+            const matchesToInsert = [];
+
+            for (let i = 0; i < numMatchesInRound; i++) {
+                // Determine names for Round 1
+                let p1 = 'TBD';
+                let p2 = 'TBD';
+                if (round === 1) {
+                    p1 = participants[i * 2] || 'TBD';
+                    p2 = participants[i * 2 + 1] || 'BYE';
+                }
+
+                matchesToInsert.push({
                     tournament_id: tournamentId,
                     round_name: roundName,
-                    p1_name: round === 1 ? (participants[i * 2] || 'TBD') : 'TBD',
-                    p2_name: round === 1 ? (participants[i * 2 + 1] || 'TBD') : 'TBD',
-                    status: 'scheduled'
+                    p1_name: p1,
+                    p2_name: p2,
+                    status: (p2 === 'BYE' && round === 1) ? 'completed' : 'scheduled',
+                    winner_id: (p2 === 'BYE' && round === 1) ? 'p1' : null,
+                    next_match_id: previousRoundMatchIds[Math.floor(i / 2)] || null
                 });
             }
-            currentRoundMatches /= 2;
+
+            const { data, error } = await supabase
+                .from('matches')
+                .insert(matchesToInsert)
+                .select();
+
+            if (error) throw error;
+
+            // Collect IDs for the next (actually previous in loop) round's children
+            previousRoundMatchIds = (data as MatchNode[]).map(m => m.id);
         }
 
-        const { data, error } = await supabase
-            .from('matches')
-            .insert(matchesToCreate)
-            .select();
-
-        if (error) throw error;
-        return data;
+        return previousRoundMatchIds; // These will be the Round 1 IDs
     },
 
     getRoundName(round: number, totalRounds: number) {

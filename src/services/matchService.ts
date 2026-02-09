@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import type { MatchNode } from '../types/tournament';
 
 export type MatchSet = {
     id: string;
