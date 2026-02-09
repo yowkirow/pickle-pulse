@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --primary: 84 81% 67%;
+    --border: 215 25% 27%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+    background-image: linear-gradient(to bottom right, #0f172a, #1e1b4b);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .sport-card {
+    @apply bg-secondary text-secondary-foreground border border-border rounded-sport overflow-hidden shadow-broadcast;
+  }
+
+  .sport-button {
+    @apply px-6 py-2 rounded-sport font-black uppercase tracking-widest transition-all duration-200;
+    @apply bg-primary text-primary-foreground hover:scale-[1.02] active:translate-y-0.5;
+  }
+
+  .sport-button-outline {
+    @apply px-6 py-2 rounded-sport font-black uppercase tracking-widest border-2 border-primary text-primary transition-all hover:bg-primary/10;
+  }
+
+  .font-broadcast {
+    @apply font-black uppercase italic tracking-tighter leading-none;
+  }
+
+  .status-active {
+    @apply bg-primary/20 text-primary border border-primary/40 px-2 py-0.5 text-[10px] font-black rounded-sm;
+  }
+}

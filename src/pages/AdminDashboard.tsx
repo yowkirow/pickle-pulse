@@ -1,0 +1,160 @@
+import React, { useEffect } from 'react';
+import { Activity, LayoutGrid, Clock } from 'lucide-react';
+
+const DashboardStat = ({ label, value, status, muted }: any) => (
+    <div className={`text-right ${muted ? 'opacity-30' : ''}`}>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-muted leading-tight mb-1">
+            {status === 'active' && <span className="inline-block w-1.5 h-1.5 bg-primary rounded-full mr-1 animate-pulse" />}
+            {label}
+        </p>
+        <p className="text-4xl font-black italic tracking-tighter leading-none">{value}</p>
+    </div>
+);
+
+const CourtCard = ({ number, status }: { number: number; status: string }) => {
+    const isOccupied = status === 'MATCH IN PROGRESS';
+    return (
+        <div className={`sport-card border-l-4 transition-all duration-300 ${isOccupied ? 'border-l-primary' : 'border-l-border opacity-70 hover:opacity-100'}`}>
+            <div className="p-4">
+                <div className="flex justify-between items-start mb-4">
+                    <span className="font-black text-4xl italic text-border leading-none">
+                        {number < 10 ? `0${number}` : number}
+                    </span>
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm ${isOccupied ? 'bg-primary text-background' : 'bg-border text-accent-muted'}`}>
+                        {status}
+                    </span>
+                </div>
+
+                {isOccupied ? (
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center bg-background/50 p-2 rounded-sm mb-1">
+                            <span className="font-black text-xs uppercase truncate pr-2">Lee / Wang</span>
+                            <span className="font-black text-primary text-xl leading-none">11</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-background/50 p-2 rounded-sm">
+                            <span className="font-black text-xs uppercase truncate pr-2">Smith / Jones</span>
+                            <span className="font-black text-white text-lg leading-none">08</span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="py-8 flex flex-col items-center justify-center border-2 border-border border-dashed rounded-sm opacity-20">
+                        <Activity size={24} />
+                    </div>
+                )}
+            </div>
+
+            <div className="bg-background/80 py-2 px-4 flex justify-between items-center border-t border-border">
+                <span className="text-[10px] font-bold text-accent-muted uppercase">Court {number} Hub</span>
+                <button className="text-[10px] font-black uppercase text-primary tracking-widest hover:underline">Details »</button>
+            </div>
+        </div>
+    );
+};
+
+export const AdminDashboard: React.FC = () => {
+    useEffect(() => {
+        // Initial fetch and Supabase Realtime subscription would go here
+    }, []);
+
+    return (
+        <div className="space-y-10">
+            {/* Real-time Ticker / Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-border pb-6 gap-6">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-primary text-background px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter rounded-sm">LIVE FEED</span>
+                        <div className="h-1 flex-1 bg-border rounded-full min-w-[100px]" />
+                    </div>
+                    <h2 className="text-5xl font-black italic tracking-tighter uppercase leading-none">
+                        Pulse Board
+                    </h2>
+                </div>
+
+                <div className="flex gap-4">
+                    <DashboardStat label="Matches Live" value="06" status="active" />
+                    <DashboardStat label="In Queue" value="14" />
+                    <DashboardStat label="Completed" value="38" muted />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                {/* Court Cards */}
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                    <CourtCard key={i} number={i} status={i % 3 === 0 ? 'MATCH IN PROGRESS' : 'READY'} />
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                {/* Match Queue */}
+                <div className="lg:col-span-2 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+                            <Clock className="text-primary" size={24} />
+                            Upcoming Schedule
+                        </h3>
+                        <button className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
+                            View Full Bracket »
+                        </button>
+                    </div>
+
+                    <div className="space-y-2">
+                        {[1, 2, 3, 4].map((m) => (
+                            <div key={m} className="sport-card p-4 flex items-center justify-between group hover:border-primary/50 transition-colors">
+                                <div className="flex items-center gap-6">
+                                    <div className="text-2xl font-black italic text-border w-10">
+                                        #{24 + m}
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-black text-lg uppercase">Anderson / Baker</span>
+                                            <span className="text-accent-muted text-xs">VS</span>
+                                            <span className="font-black text-lg uppercase">Carter / Davis</span>
+                                        </div>
+                                        <p className="text-[10px] font-bold text-accent-muted uppercase tracking-widest">
+                                            Men's Doubles Open • Round of 16
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="text-right hidden sm:block">
+                                        <p className="text-[10px] font-bold text-accent-muted uppercase">Estimated Start</p>
+                                        <p className="font-black text-xs uppercase">T-Minus 12m</p>
+                                    </div>
+                                    <button className="sport-button-outline text-[10px] px-3 py-1 opacity-0 group-hover:opacity-100">
+                                        Assign Court
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Sidebar Info */}
+                <div className="space-y-6">
+                    <div className="sport-card p-6 bg-primary text-background border-none">
+                        <h4 className="font-black uppercase tracking-tighter text-sm mb-4">Smart Autopilot</h4>
+                        <p className="text-2xl font-black leading-tight mb-4 italic">AUTOPILOT IS ACTIVELY OPTIMIZING COURT 04 & 07</p>
+                        <div className="h-2 bg-background/20 rounded-full overflow-hidden mb-4">
+                            <div className="h-full bg-background w-[65%] animate-[shimmer_2s_infinite]" />
+                        </div>
+                        <button className="w-full bg-background text-primary font-black uppercase py-2 text-xs tracking-widest hover:scale-[1.02] transition-transform">
+                            Pause Autopilot
+                        </button>
+                    </div>
+
+                    <div className="sport-card p-6 border-2 border-border">
+                        <h4 className="font-black uppercase text-sm mb-4 flex items-center gap-2">
+                            <LayoutGrid size={18} />
+                            Division Quick-View
+                        </h4>
+                        <div className="flex flex-wrap gap-2 text-[10px] font-bold uppercase">
+                            <button className="bg-white/10 px-3 py-1.5 rounded-sm hover:bg-primary hover:text-background tracking-widest">Men's Open</button>
+                            <button className="bg-white/10 px-3 py-1.5 rounded-sm hover:bg-primary hover:text-background tracking-widest">Women's 4.0</button>
+                            <button className="border border-border px-3 py-1.5 rounded-sm text-accent-muted">Senior Mix</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
