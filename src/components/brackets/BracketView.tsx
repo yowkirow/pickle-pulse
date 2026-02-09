@@ -1,20 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-
-interface MatchNode {
-    id: string;
-    p1_name: string;
-    p2_name: string;
-    score1?: number;
-    score2?: number;
-    winner_id?: string;
-    status: 'scheduled' | 'in_progress' | 'completed';
-}
-
-interface Round {
-    name: string;
-    matches: MatchNode[];
-}
+import { Round, MatchNode } from '../../types/tournament';
 
 interface BracketProps {
     rounds: Round[];

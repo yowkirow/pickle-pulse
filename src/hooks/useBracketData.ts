@@ -1,21 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-
-export interface MatchNode {
-    id: string;
-    p1_name: string;
-    p2_name: string;
-    score1?: number;
-    score2?: number;
-    winner_id?: string;
-    status: 'scheduled' | 'in_progress' | 'completed';
-    round_name: string;
-}
-
-export interface Round {
-    name: string;
-    matches: MatchNode[];
-}
+import { Round, MatchNode } from '../types/tournament';
 
 export const useBracketData = (tournamentId: string | undefined) => {
     const [rounds, setRounds] = useState<Round[]>([]);
@@ -68,8 +53,7 @@ export const useBracketData = (tournamentId: string | undefined) => {
                 });
             });
 
-            // Convert to ordered array (Simple logic: sort by round sequence if possible)
-            // For now, just taking uniques in order of appearance
+            // Convert to ordered array
             const orderedRounds = Object.entries(groupedRounds).map(([name, matches]) => ({
                 name,
                 matches

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Activity, LayoutGrid, Clock } from 'lucide-react';
 import { BracketView } from '../components/brackets/BracketView';
+import { Round } from '../types/tournament';
 
 interface DashboardStatProps {
     label: string;
@@ -59,8 +60,8 @@ const CourtCard = ({ number, status }: { number: number; status: string }) => {
     );
 };
 
-// Mock data for the bracket
-const MOCK_ROUNDS = [
+// Mock data typed correctly
+const MOCK_ROUNDS: Round[] = [
     {
         name: 'Quarter-Finals',
         matches: [
