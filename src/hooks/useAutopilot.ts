@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export const useAutopilot = (tournamentId?: string, active: boolean = false) => {
