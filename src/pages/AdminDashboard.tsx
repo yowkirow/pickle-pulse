@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { Activity, LayoutGrid, Clock } from 'lucide-react';
 import { BracketView } from '../components/brackets/BracketView';
@@ -19,25 +18,25 @@ interface DashboardStatProps {
 }
 
 const DashboardStat = ({ label, value, status, muted }: DashboardStatProps) => (
-    <div className={`text - right ${ muted ? 'opacity-30' : '' } `}>
+    <div className={`text - right ${muted ? 'opacity-30' : ''} `}>
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-muted leading-tight mb-1">
             {status === 'active' && <span className="inline-block w-1.5 h-1.5 bg-primary rounded-full mr-1 animate-pulse" />}
             {label}
         </p>
-        <p className="text-4xl font-black italic tracking-tighter leading-none">{typeof value === 'number' && value < 10 && value !== 0 ? `0${ value } ` : value}</p>
+        <p className="text-4xl font-black italic tracking-tighter leading-none">{typeof value === 'number' && value < 10 && value !== 0 ? `0${value} ` : value}</p>
     </div>
 );
 
 const CourtCard = ({ court, match }: { court: any; match?: any }) => {
     const isOccupied = court.status === 'occupied' || !!match;
     return (
-        <div className={`sport - card border - l - 4 transition - all duration - 300 ${ isOccupied ? 'border-l-primary' : 'border-l-border opacity-70 hover:opacity-100' } `}>
+        <div className={`sport - card border - l - 4 transition - all duration - 300 ${isOccupied ? 'border-l-primary' : 'border-l-border opacity-70 hover:opacity-100'} `}>
             <div className="p-4">
                 <div className="flex justify-between items-start mb-4">
                     <span className="font-black text-4xl italic text-border leading-none">
-                        {court.court_number < 10 ? `0${ court.court_number } ` : court.court_number}
+                        {court.court_number < 10 ? `0${court.court_number} ` : court.court_number}
                     </span>
-                    <span className={`text - [10px] font - black uppercase tracking - widest px - 2 py - 0.5 rounded - sm ${ isOccupied ? 'bg-primary text-background' : 'bg-border text-accent-muted' } `}>
+                    <span className={`text - [10px] font - black uppercase tracking - widest px - 2 py - 0.5 rounded - sm ${isOccupied ? 'bg-primary text-background' : 'bg-border text-accent-muted'} `}>
                         {isOccupied ? 'MATCH IN PROGRESS' : 'READY'}
                     </span>
                 </div>
@@ -61,7 +60,7 @@ const CourtCard = ({ court, match }: { court: any; match?: any }) => {
 
             <div className="bg-background/80 py-2 px-4 flex justify-between items-center border-t border-border">
                 <span className="text-[10px] font-bold text-accent-muted uppercase">Court {court.court_number} Hub</span>
-                <Link to={`/ admin / courts ? tid = ${ court.tournament_id } `} className="text-[10px] font-black uppercase text-primary tracking-widest hover:underline">Config »</Link>
+                <Link to={`/ admin / courts ? tid = ${court.tournament_id} `} className="text-[10px] font-black uppercase text-primary tracking-widest hover:underline">Config »</Link>
             </div>
         </div>
     );
@@ -137,7 +136,7 @@ export const AdminDashboard: React.FC = () => {
                     </h3>
                     <div className="text-[10px] font-bold text-accent-muted uppercase tracking-widest flex items-center gap-2">
                         {loading ? 'SYNCING PULSE...' : 'LIVE SYNC ACTIVE'}
-                        <div className={`w - 2 h - 2 rounded - full ${ loading ? 'bg-accent-muted' : 'bg-primary animate-pulse' } `} />
+                        <div className={`w - 2 h - 2 rounded - full ${loading ? 'bg-accent-muted' : 'bg-primary animate-pulse'} `} />
                     </div>
                 </div>
                 <BracketView rounds={rounds.length > 0 ? rounds : MOCK_ROUNDS} />
@@ -149,7 +148,7 @@ export const AdminDashboard: React.FC = () => {
                     Venue Status
                 </h3>
                 <Link
-                    to={`/ admin / courts ? tid = ${ tournamentId } `}
+                    to={`/ admin / courts ? tid = ${tournamentId} `}
                     className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
                 >
                     Provision Venue »
@@ -200,11 +199,11 @@ export const AdminDashboard: React.FC = () => {
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <span className={`font - black text - lg uppercase ${ m.status === 'completed' ? 'text-accent-muted' : '' } `}>
+                                                <span className={`font - black text - lg uppercase ${m.status === 'completed' ? 'text-accent-muted' : ''} `}>
                                                     {m.p1_name}
                                                 </span>
                                                 <span className="text-accent-muted text-xs">VS</span>
-                                                <span className={`font - black text - lg uppercase ${ m.status === 'completed' ? 'text-accent-muted' : '' } `}>
+                                                <span className={`font - black text - lg uppercase ${m.status === 'completed' ? 'text-accent-muted' : ''} `}>
                                                     {m.p2_name}
                                                 </span>
                                             </div>
@@ -216,7 +215,7 @@ export const AdminDashboard: React.FC = () => {
                                     <div className="flex items-center gap-4">
                                         <div className="text-right hidden sm:block">
                                             <p className="text-[10px] font-bold text-accent-muted uppercase">Pulse Status</p>
-                                            <p className={`font - black text - xs uppercase ${ m.status === 'in_progress' ? 'text-primary' : '' } `}>
+                                            <p className={`font - black text - xs uppercase ${m.status === 'in_progress' ? 'text-primary' : ''} `}>
                                                 {m.status}
                                             </p>
                                         </div>
