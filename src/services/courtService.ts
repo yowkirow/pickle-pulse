@@ -1,29 +1,50 @@
 import { supabase } from '../lib/supabase';
 
-export type Court = {
+export interface Court {
     id: string;
     tournament_id: string;
-    name: string;
-    is_available: boolean;
-};
+    court_number: number;
+    status: 'available' | 'occupied' | 'maintenance';
+    created_at: string;
+}
 
 export const CourtService = {
-    async getByTournament(tournamentId: string) {
+    async getCourts(tournamentId: string) {
         const { data, error } = await supabase
             .from('courts')
             .select('*')
             .eq('tournament_id', tournamentId)
-            .order('name', { ascending: true });
+            .order('court_number', { ascending: true });
 
         if (error) throw error;
         return data as Court[];
     },
 
-    async updateAvailability(id: string, is_available: boolean) {
+    async addCourt(tournamentId: string, courtNumber: number) {
+        const { data, error } = await supabase
+            .from('courts')
+            .insert([{ tournament_id: tournamentId, court_number: courtNumber }])
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data as Court;
+    },
+
+    async deleteCourt(courtId: string) {
         const { error } = await supabase
             .from('courts')
-            .update({ is_available })
-            .eq('id', id);
+            .delete()
+            .eq('id', courtId);
+
+        if (error) throw error;
+    },
+
+    async updateStatus(courtId: string, status: Court['status']) {
+        const { error } = await supabase
+            .from('courts')
+            .update({ status })
+            .eq('id', courtId);
 
         if (error) throw error;
     }

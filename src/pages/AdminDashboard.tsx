@@ -137,6 +137,19 @@ export const AdminDashboard: React.FC = () => {
                 <BracketView rounds={rounds.length > 0 ? rounds : MOCK_ROUNDS} />
             </div>
 
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+                    <Activity className="text-primary" size={24} />
+                    Venue Status
+                </h3>
+                <Link
+                    to={`/admin/courts?tid=${tournamentId}`}
+                    className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
+                >
+                    Provision Venue »
+                </Link>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 {/* Court Cards */}
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
