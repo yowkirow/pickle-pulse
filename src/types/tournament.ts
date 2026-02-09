@@ -10,6 +10,7 @@ export interface MatchNode {
     status: MatchStatus;
     round_name?: string;
     next_match_id?: string;
+    court_id?: string;
 }
 
 export interface Round {
