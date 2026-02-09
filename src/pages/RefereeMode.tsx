@@ -21,6 +21,26 @@ export const RefereeMode: React.FC = () => {
         }
     };
 
+    const startFirstSet = async () => {
+        if (!selectedMatchId) return;
+        try {
+            await MatchService.createSet(selectedMatchId, 1);
+        } catch (err) {
+            console.error('Initialization error:', err);
+        }
+    };
+
+    const handleFinalizeMatch = async () => {
+        if (!match || !currentSet) return;
+        const winner = currentSet.p1_score > currentSet.p2_score ? 'p1' : 'p2';
+        try {
+            await MatchService.completeMatch(match.id, winner);
+            setSelectedMatchId(null);
+        } catch (err) {
+            console.error('Finalization error:', err);
+        }
+    };
+
     if (!selectedMatchId) {
         return (
             <div className="max-w-2xl mx-auto space-y-8">
@@ -47,7 +67,10 @@ export const RefereeMode: React.FC = () => {
                                 className="sport-card p-6 flex items-center justify-between group hover:border-primary transition-all text-left"
                             >
                                 <div>
-                                    <p className="text-[10px] font-black text-primary uppercase mb-1">{m.round_name || 'Tournament Play'}</p>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-[10px] font-black text-primary uppercase">{m.round_name || 'Tournament Play'}</span>
+                                        {m.status === 'in_progress' && <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />}
+                                    </div>
                                     <h4 className="text-xl font-black uppercase italic tracking-tighter">
                                         {m.p1_name} <span className="text-accent-muted not-italic px-2">VS</span> {m.p2_name}
                                     </h4>
@@ -76,6 +99,32 @@ export const RefereeMode: React.FC = () => {
         );
     }
 
+    if (sets.length === 0) {
+        return (
+            <div className="max-w-2xl mx-auto h-full flex flex-col items-center justify-center space-y-8">
+                <div className="sport-card p-12 text-center space-y-6">
+                    <Trophy className="mx-auto text-primary" size={64} />
+                    <div>
+                        <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-2">{match.p1_name} VS {match.p2_name}</h3>
+                        <p className="text-accent-muted font-bold uppercase text-xs tracking-[0.2em]">{match.round_name || 'Tournament Play'}</p>
+                    </div>
+                    <button
+                        onClick={startFirstSet}
+                        className="sport-button w-full py-6 text-xl"
+                    >
+                        START MATCH HEARTBEAT
+                    </button>
+                    <button
+                        onClick={() => setSelectedMatchId(null)}
+                        className="text-xs font-black uppercase tracking-widest text-accent-muted hover:text-white"
+                    >
+                        Cancel & Return
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-2xl mx-auto h-full flex flex-col space-y-4 lg:space-y-8">
             {/* Match Status Bar */}
@@ -92,7 +141,7 @@ export const RefereeMode: React.FC = () => {
                             <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                             <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Live Officiating</p>
                         </div>
-                        <h3 className="text-xl font-black uppercase italic tracking-tighter">
+                        <h3 className="text-xl font-black uppercase italic tracking-tighter truncate max-w-[150px] sm:max-w-none">
                             {match.round_name || 'Match Play'}
                         </h3>
                     </div>
@@ -100,11 +149,11 @@ export const RefereeMode: React.FC = () => {
                 <div className="hidden sm:flex items-center gap-4 text-right">
                     <div className="px-3 border-r border-border">
                         <p className="text-[10px] font-bold text-accent-muted uppercase tracking-widest">Status</p>
-                        <p className="font-black text-xs uppercase text-primary">{match.status}</p>
+                        <p className="font-black text-xs uppercase text-primary animate-pulse">{match.status}</p>
                     </div>
                     <div>
-                        <p className="text-[10px] font-bold text-accent-muted uppercase tracking-widest">Sets</p>
-                        <p className="font-black text-xs uppercase">{sets.length} Played</p>
+                        <p className="text-[10px] font-bold text-accent-muted uppercase tracking-widest">Pulse Round</p>
+                        <p className="font-black text-xs uppercase">Set {sets.length}</p>
                     </div>
                 </div>
             </div>
@@ -138,9 +187,12 @@ export const RefereeMode: React.FC = () => {
                     <Shield size={18} />
                     Review Point
                 </button>
-                <button className=" sport-button p-4 text-sm flex items-center justify-center gap-2">
+                <button
+                    onClick={handleFinalizeMatch}
+                    className=" sport-button p-4 text-sm flex items-center justify-center gap-2"
+                >
                     <CheckCircle2 size={18} />
-                    Finalize Set
+                    End Match
                 </button>
             </div>
         </div>
