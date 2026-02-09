@@ -44,8 +44,33 @@ export const BracketEngine = {
 
             if (error) throw error;
 
-            // Collect IDs for the next (actually previous in loop) round's children
-            previousRoundMatchIds = (data as MatchNode[]).map(m => m.id);
+            const currentRoundMatches = data as MatchNode[];
+            previousRoundMatchIds = currentRoundMatches.map(m => m.id);
+
+            // Handle advancement for BYEs in this round
+            for (const match of currentRoundMatches) {
+                if (match.status === 'completed' && match.next_match_id && match.winner_id) {
+                    const winnerName = match.winner_id === 'p1' ? match.p1_name : match.p2_name;
+                    // We need to determine if we are p1 or p2 in the parent. 
+                    // This is tricky because the parent isn't in DB yet in a true bottom-up.
+                    // WAIT: My loop is round = numRounds down to 1.
+                    // So when I am at Round 1, the next_match (Round 2) IS already in the DB.
+                    // Let's find the next match and update it.
+                    const { data: nextMatch } = await supabase
+                        .from('matches')
+                        .select('*')
+                        .eq('id', match.next_match_id)
+                        .single();
+
+                    if (nextMatch) {
+                        const fieldToUpdate = (nextMatch as MatchNode).p1_name === 'TBD' ? 'p1_name' : 'p2_name';
+                        await supabase
+                            .from('matches')
+                            .update({ [fieldToUpdate]: winnerName })
+                            .eq('id', match.next_match_id);
+                    }
+                }
+            }
         }
 
         return previousRoundMatchIds; // These will be the Round 1 IDs
@@ -58,3 +83,4 @@ export const BracketEngine = {
         return `Round of ${Math.pow(2, totalRounds - round + 1)}`;
     }
 };
+```
