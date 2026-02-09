@@ -4,6 +4,7 @@ import { useTournaments } from '../hooks/useTournaments';
 import type { Tournament } from '../types/tournament';
 import { PlusCircle, Trophy, ListOrdered, Share2, Activity, Settings2, Calendar, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { BracketEngine } from '../services/bracketEngine';
 
 export const TournamentManager: React.FC = () => {
     const [name, setName] = useState('');
@@ -17,10 +18,31 @@ export const TournamentManager: React.FC = () => {
         try {
             await TournamentService.create({ name, format });
             setName('');
-            // Toast or notification would be better than alert
         } catch (err: any) {
             console.error(err);
             alert(`Initialization error: ${err.message || 'Check connection'}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSeed = async (tournamentId: string) => {
+        const input = prompt("Enter participant names (comma-separated):");
+        if (!input) return;
+        const participants = input.split(',').map(s => s.trim()).filter(Boolean);
+        if (participants.length < 2) {
+            alert("Need at least 2 participants");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await BracketEngine.generateInitialBracket(tournamentId, participants);
+            await TournamentService.updateStatus(tournamentId, 'active');
+            alert("Bracket seeded successfully!");
+        } catch (err: any) {
+            console.error(err);
+            alert(`Seeding error: ${err.message}`);
         } finally {
             setLoading(false);
         }
@@ -160,7 +182,16 @@ export const TournamentManager: React.FC = () => {
                                     <div className="flex items-center gap-4">
                                         <div className="text-right hidden sm:block">
                                             <p className="text-[10px] font-bold text-accent-muted uppercase mb-1">Command Center</p>
-                                            <p className="font-black text-xs uppercase text-primary">Live Dashboard »</p>
+                                            {t.status === 'planning' ? (
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSeed(t.id); }}
+                                                    className="font-black text-xs uppercase text-primary hover:underline italic"
+                                                >
+                                                    Seed Bracket »
+                                                </button>
+                                            ) : (
+                                                <p className="font-black text-xs uppercase text-primary">Live Dashboard »</p>
+                                            )}
                                         </div>
                                         <ChevronRight className="text-accent-muted group-hover:text-primary transition-colors" size={24} />
                                     </div>
