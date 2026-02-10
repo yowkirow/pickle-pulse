@@ -5,7 +5,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { TournamentManager } from './pages/TournamentManager';
 import { RefereeMode } from './pages/RefereeMode';
 import { CourtManager } from './pages/CourtManager';
-
+import { PlayerManager } from './pages/PlayerManager';
 import { RegistrationPage } from './pages/RegistrationPage';
 
 const App: React.FC = () => {
@@ -18,6 +18,7 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="/admin" replace />} />
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="admin/courts" element={<CourtManager />} />
+          <Route path="admin/players" element={<PlayerManager />} />
           <Route path="tournaments" element={<TournamentManager />} />
           <Route path="referee" element={<RefereeMode />} />
         </Route>

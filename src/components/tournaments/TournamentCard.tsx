@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Calendar, ChevronRight, UserPlus, ClipboardList } from 'lucide-react';
+import { Trophy, Calendar, ChevronRight, UserPlus, ClipboardList, Users } from 'lucide-react';
 import type { Tournament } from '../../types/tournament';
 import { useParticipants } from '../../hooks/useParticipants';
 
@@ -19,17 +19,6 @@ export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament, onSe
         e.stopPropagation();
         navigator.clipboard.writeText(registrationUrl);
         alert("Registration link copied to clipboard!");
-    };
-
-    const handleBulkSeed = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (participants.length < 2) {
-            alert("Need at least 2 registered participants to seed.");
-            return;
-        }
-        const names = participants.map((p: any) => p.name);
-        onSeed(tournament.id, names);
     };
 
     return (
@@ -84,18 +73,13 @@ export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament, onSe
                     </div>
                     {tournament.status === 'planning' ? (
                         <div className="flex items-center gap-3">
-                            <button
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSeed(tournament.id); }}
-                                className="font-black text-[10px] uppercase text-accent-muted hover:text-white transition-colors"
+                            <Link
+                                to={`/admin/players?tid=${tournament.id}`}
+                                className="font-black text-xs uppercase text-primary hover:underline italic flex items-center gap-2"
                             >
-                                Manual Seed »
-                            </button>
-                            <button
-                                onClick={handleBulkSeed}
-                                className="font-black text-xs uppercase text-primary hover:underline italic"
-                            >
-                                Seed Registrations »
-                            </button>
+                                <Users size={14} />
+                                Manage Players & Seed »
+                            </Link>
                         </div>
                     ) : (
                         <p className="font-black text-xs uppercase text-primary">Live Dashboard »</p>
