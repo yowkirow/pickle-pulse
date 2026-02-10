@@ -160,7 +160,6 @@ export const TournamentManager: React.FC = () => {
                                 <TournamentCard
                                     key={t.id}
                                     tournament={t}
-                                    onSeed={handleSeed}
                                 />
                             ))
                         ) : (

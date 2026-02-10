@@ -6,10 +6,9 @@ import { useParticipants } from '../../hooks/useParticipants';
 
 interface TournamentCardProps {
     tournament: Tournament;
-    onSeed: (tournamentId: string, participantNames?: string[]) => void;
 }
 
-export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament, onSeed }) => {
+export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament }) => {
     const { participants, loading } = useParticipants(tournament.id);
 
     const registrationUrl = `${window.location.origin}/register/${tournament.id}`;
