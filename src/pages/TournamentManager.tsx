@@ -3,7 +3,6 @@ import { TournamentService } from '../services/tournamentService';
 import { useTournaments } from '../hooks/useTournaments';
 import type { Tournament } from '../types/tournament';
 import { PlusCircle, Trophy, ListOrdered, Share2, Activity, Settings2 } from 'lucide-react';
-import { BracketEngine } from '../services/bracketEngine';
 import { TournamentCard } from '../components/tournaments/TournamentCard';
 
 export const TournamentManager: React.FC = () => {
@@ -21,33 +20,6 @@ export const TournamentManager: React.FC = () => {
         } catch (err: any) {
             console.error(err);
             alert(`Initialization error: ${err.message || 'Check connection'}`);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleSeed = async (tournamentId: string, participantNames?: string[]) => {
-        let participants = participantNames;
-
-        if (!participants) {
-            const input = prompt("Enter participant names (comma-separated):");
-            if (!input) return;
-            participants = input.split(',').map(s => s.trim()).filter(Boolean);
-        }
-
-        if (participants.length < 2) {
-            alert("Need at least 2 participants");
-            return;
-        }
-
-        setLoading(true);
-        try {
-            await BracketEngine.generateInitialBracket(tournamentId, participants);
-            await TournamentService.updateStatus(tournamentId, 'active');
-            alert("Bracket seeded successfully!");
-        } catch (err: any) {
-            console.error(err);
-            alert(`Seeding error: ${err.message}`);
         } finally {
             setLoading(false);
         }

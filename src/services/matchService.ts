@@ -66,10 +66,6 @@ export const MatchService = {
         if ((match as MatchNode).next_match_id) {
             const winnerName = winnerId === 'p1' ? (match as MatchNode).p1_name : (match as MatchNode).p2_name;
 
-            // We need to know if we are p1 or p2 in the next match.
-            // A simple way is to check if p1_name is 'TBD' in the next match.
-            // But better logic: find the siblings to determine position.
-            // For now, let's use a simpler heuristic: try to fill p1, then p2.
             const { data: nextMatch } = await supabase
                 .from('matches')
                 .select('*')
@@ -84,5 +80,17 @@ export const MatchService = {
                     .eq('id', (match as MatchNode).next_match_id);
             }
         }
+    },
+
+    async assignCourt(matchId: string, courtId: string) {
+        const { error } = await supabase
+            .from('matches')
+            .update({
+                court_id: courtId,
+                status: 'in_progress'
+            })
+            .eq('id', matchId);
+
+        if (error) throw error;
     }
 };

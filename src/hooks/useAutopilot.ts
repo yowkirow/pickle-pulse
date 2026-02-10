@@ -11,7 +11,7 @@ export const useAutopilot = (tournamentId?: string, active: boolean = false) => 
                 .from('courts')
                 .select('*')
                 .eq('tournament_id', tournamentId)
-                .order('name', { ascending: true });
+                .order('court_number', { ascending: true });
 
             // 2. Get ready matches (scheduled, both players known, not completed)
             const { data: matches } = await supabase
@@ -43,7 +43,7 @@ export const useAutopilot = (tournamentId?: string, active: boolean = false) => 
                 const court = freeCourts[i];
                 const match = matches[i];
 
-                console.log(`Autopilot: Assigning ${match.id} to ${court.name}`);
+                console.log(`Autopilot: Assigning ${match.id} to Court ${court.court_number}`);
 
                 await supabase
                     .from('matches')

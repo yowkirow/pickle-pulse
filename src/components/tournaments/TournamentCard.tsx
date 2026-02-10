@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Trophy, Calendar, ChevronRight, UserPlus, ClipboardList, Users } from 'lucide-react';
 import type { Tournament } from '../../types/tournament';
 import { useParticipants } from '../../hooks/useParticipants';
@@ -10,8 +10,13 @@ interface TournamentCardProps {
 
 export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament }) => {
     const { participants, loading } = useParticipants(tournament.id);
+    const navigate = useNavigate();
 
     const registrationUrl = `${window.location.origin}/register/${tournament.id}`;
+
+    const handleCardClick = () => {
+        navigate(`/admin?tid=${tournament.id}`);
+    };
 
     const handleCopyLink = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -21,8 +26,8 @@ export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament }) =>
     };
 
     return (
-        <Link
-            to={`/admin?tid=${tournament.id}`}
+        <div
+            onClick={handleCardClick}
             className="sport-card p-6 flex flex-col sm:flex-row items-center justify-between group hover:border-primary/50 transition-all cursor-pointer bg-white/5 gap-6"
         >
             <div className="flex items-center gap-6 w-full sm:w-auto">
@@ -72,13 +77,16 @@ export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament }) =>
                     </div>
                     {tournament.status === 'planning' ? (
                         <div className="flex items-center gap-3">
-                            <Link
-                                to={`/admin/players?tid=${tournament.id}`}
-                                className="font-black text-xs uppercase text-primary hover:underline italic flex items-center gap-2"
+                            <div
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/admin/players?tid=${tournament.id}`);
+                                }}
+                                className="font-black text-xs uppercase text-primary hover:underline italic flex items-center gap-2 cursor-pointer"
                             >
                                 <Users size={14} />
                                 Manage Players & Seed »
-                            </Link>
+                            </div>
                         </div>
                     ) : (
                         <p className="font-black text-xs uppercase text-primary">Live Dashboard »</p>
@@ -86,6 +94,6 @@ export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament }) =>
                 </div>
                 <ChevronRight className="text-accent-muted group-hover:text-primary transition-colors hidden sm:block" size={24} />
             </div>
-        </Link>
+        </div>
     );
 };
