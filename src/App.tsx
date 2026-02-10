@@ -6,10 +6,14 @@ import { TournamentManager } from './pages/TournamentManager';
 import { RefereeMode } from './pages/RefereeMode';
 import { CourtManager } from './pages/CourtManager';
 
+import { RegistrationPage } from './pages/RegistrationPage';
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/register/:tournamentId" element={<RegistrationPage />} />
+        <Route path="/register" element={<RegistrationPage />} />
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Navigate to="/admin" replace />} />
           <Route path="admin" element={<AdminDashboard />} />

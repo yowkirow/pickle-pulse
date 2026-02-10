@@ -22,9 +22,9 @@ export const MainLayout: React.FC = () => {
                     </div>
                 </div>
 
-                <nav className="hidden lg:flex items-center gap-1">
+                <nav className="hidden md:flex items-center gap-1">
                     <NavBarItem to="/admin" icon={<LayoutDashboard size={18} />} label="Command Center" />
-                    <NavBarItem to="/tournaments" icon={<Users size={18} />} label="Tournament Admin" />
+                    <NavBarItem to="/tournaments" icon={<Users size={18} />} label="Tournaments" />
                     <NavBarItem to="/referee" icon={<UserCheck size={18} />} label="Referee Portal" />
                 </nav>
 
@@ -47,10 +47,10 @@ export const MainLayout: React.FC = () => {
             </main>
 
             {/* Mobile Bottom Navigation */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-secondary border-t border-border flex justify-around items-center p-3 z-50">
-                <MobileNavItem to="/admin" icon={<LayoutDashboard size={20} />} />
-                <MobileNavItem to="/tournaments" icon={<Users size={20} />} />
-                <MobileNavItem to="/referee" icon={<UserCheck size={20} />} />
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-secondary border-t border-border flex justify-around items-center p-3 z-50">
+                <MobileNavItem to="/admin" icon={<LayoutDashboard size={20} />} label="Command" />
+                <MobileNavItem to="/tournaments" icon={<Users size={20} />} label="Events" />
+                <MobileNavItem to="/referee" icon={<UserCheck size={20} />} label="Referee" />
             </nav>
         </div>
     );
@@ -71,16 +71,17 @@ const NavBarItem = ({ to, icon, label }: { to: string; icon: React.ReactNode; la
     </NavLink>
 );
 
-const MobileNavItem = ({ to, icon }: { to: string; icon: React.ReactNode }) => (
+const MobileNavItem = ({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) => (
     <NavLink
         to={to}
         className={({ isActive }) =>
-            `p-4 transition-all duration-200 ${isActive
+            `flex flex-col items-center gap-1 transition-all duration-200 ${isActive
                 ? 'text-primary'
-                : 'text-accent-muted hover:text-white'
+                : 'text-accent-muted'
             }`
         }
     >
         {icon}
+        <span className="text-[8px] font-black uppercase tracking-tighter">{label}</span>
     </NavLink>
 );

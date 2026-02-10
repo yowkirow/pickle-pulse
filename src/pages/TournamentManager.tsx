@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { TournamentService } from '../services/tournamentService';
 import { useTournaments } from '../hooks/useTournaments';
 import type { Tournament } from '../types/tournament';
-import { PlusCircle, Trophy, ListOrdered, Share2, Activity, Settings2, Calendar, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { PlusCircle, Trophy, ListOrdered, Share2, Activity, Settings2 } from 'lucide-react';
 import { BracketEngine } from '../services/bracketEngine';
+import { TournamentCard } from '../components/tournaments/TournamentCard';
 
 export const TournamentManager: React.FC = () => {
     const [name, setName] = useState('');
@@ -26,10 +26,15 @@ export const TournamentManager: React.FC = () => {
         }
     };
 
-    const handleSeed = async (tournamentId: string) => {
-        const input = prompt("Enter participant names (comma-separated):");
-        if (!input) return;
-        const participants = input.split(',').map(s => s.trim()).filter(Boolean);
+    const handleSeed = async (tournamentId: string, participantNames?: string[]) => {
+        let participants = participantNames;
+
+        if (!participants) {
+            const input = prompt("Enter participant names (comma-separated):");
+            if (!input) return;
+            participants = input.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
         if (participants.length < 2) {
             alert("Need at least 2 participants");
             return;
@@ -83,7 +88,7 @@ export const TournamentManager: React.FC = () => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="E.G. US OPEN QUALIFIER"
-                                    className="w-full bg-background border-2 border-border rounded-sport px-4 py-4 focus:outline-none focus:border-primary font-black uppercase tracking-widest transition-colors text-white"
+                                    className="w-full bg-background border-2 border-border rounded-sport px-4 py-4 focus:outline-none focus:border-primary font-black uppercase tracking-widest transition-colors text-white text-base"
                                     required
                                 />
                             </div>
@@ -152,50 +157,11 @@ export const TournamentManager: React.FC = () => {
                             </div>
                         ) : tournaments.length > 0 ? (
                             tournaments.map((t) => (
-                                <Link
-                                    to={`/admin?tid=${t.id}`}
+                                <TournamentCard
                                     key={t.id}
-                                    className="sport-card p-6 flex items-center justify-between group hover:border-primary/50 transition-all cursor-pointer bg-white/5"
-                                >
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-12 h-12 bg-secondary rounded-sport flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-background transition-colors">
-                                            <Trophy size={24} />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-black text-2xl italic uppercase tracking-tighter leading-none mb-2 group-hover:text-primary transition-colors">
-                                                {t.name}
-                                            </h4>
-                                            <div className="flex items-center gap-4 text-[10px] font-bold text-accent-muted uppercase tracking-widest">
-                                                <span className="flex items-center gap-1">
-                                                    <Calendar size={12} />
-                                                    {new Date(t.created_at).toLocaleDateString()}
-                                                </span>
-                                                <span className="bg-border px-2 py-0.5 rounded-sm text-white">
-                                                    {t.format.replace('_', ' ')}
-                                                </span>
-                                                <span className="text-primary font-black">
-                                                    {t.status}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-right hidden sm:block">
-                                            <p className="text-[10px] font-bold text-accent-muted uppercase mb-1">Command Center</p>
-                                            {t.status === 'planning' ? (
-                                                <button
-                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSeed(t.id); }}
-                                                    className="font-black text-xs uppercase text-primary hover:underline italic"
-                                                >
-                                                    Seed Bracket »
-                                                </button>
-                                            ) : (
-                                                <p className="font-black text-xs uppercase text-primary">Live Dashboard »</p>
-                                            )}
-                                        </div>
-                                        <ChevronRight className="text-accent-muted group-hover:text-primary transition-colors" size={24} />
-                                    </div>
-                                </Link>
+                                    tournament={t}
+                                    onSeed={handleSeed}
+                                />
                             ))
                         ) : (
                             <div className="sport-card p-20 flex flex-col items-center justify-center text-accent-muted bg-white/5 border-dashed border-2">
@@ -203,7 +169,7 @@ export const TournamentManager: React.FC = () => {
                                     <Trophy size={40} />
                                 </div>
                                 <p className="font-black uppercase tracking-[0.2em] italic mb-2">No Active Pulse Detected</p>
-                                <p className="text-xs text-accent-muted/60 max-w-sm text-center font-bold">The tournament registry is currently empty. Use the sidebar to initiate the heartbeat of your first event.</p>
+                                <p className="text-xs text-accent-muted/60 max-w-sm text-center font-bold">The tournament registry is currently empty. Use the form to initiate the heartbeat of your first event.</p>
                             </div>
                         )}
                     </div>
